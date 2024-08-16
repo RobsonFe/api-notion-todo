@@ -65,14 +65,33 @@ export class NotionService {
             };
 
             const file_path = `./planilhas/Tarefas.xlsx`;
-            // Criar uma nova planilha e adicionar os dados
-            const workbook = XLSX.utils.book_new(); // Cria um novo arquivo Excel
-            const worksheet = XLSX.utils.json_to_sheet([notionJson]); // Adiciona o JSON na planilha
-            XLSX.utils.book_append_sheet(workbook, worksheet, `Tarefas`); // Cria a planilha com todos os dados passados.
-            XLSX.writeFile(workbook, file_path); // Arquivo Excel que será escrito e o caminho onde ficará salvo o arquivo.
+            let workbook;
 
-            console.table(notionJson);
+            try {
+                // Tentar carregar a planilha existente
+                workbook = XLSX.readFile(file_path);
+            } catch (error) {
+                // Se o arquivo não existir, cria um novo workbook
+                workbook = XLSX.utils.book_new();
+            }
+
+            // Pegar a worksheet existente ou criar uma nova
+            let worksheet = workbook.Sheets['Tarefas'];
+            if (!worksheet) {
+                worksheet = XLSX.utils.json_to_sheet([notionJson]);
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Tarefas');
+            } else {
+                // Converter worksheet para JSON, adicionar o novo dado, e converter de volta para worksheet
+                const worksheetData = XLSX.utils.sheet_to_json(worksheet);
+                worksheetData.push(notionJson);
+                worksheet = XLSX.utils.json_to_sheet(worksheetData);
+                workbook.Sheets['Tarefas'] = worksheet;
+            }
+
+            XLSX.writeFile(workbook, file_path); // Salvar o arquivo Excel
+
             console.log(`Arquivo salvo em: ${file_path}`);
+            console.table(notionJson);
 
             return await notion.save();
         } catch (error) {
