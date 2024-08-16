@@ -20,6 +20,10 @@ export class NotionService {
     }
 
     async createTask(createTaskDto: CreateTaskDto): Promise<Notion> {
+        // Começar uma transação para as operações do banco de dados, se possível
+        const session = await this.notionModel.startSession();
+        session.startTransaction();
+
         try {
             const databaseId = process.env.ID_DO_BANCO;
 
@@ -29,6 +33,7 @@ export class NotionService {
                 );
             }
 
+            // Passo 1: Criar a tarefa no Notion
             const response = await this.notion.pages.create({
                 parent: {
                     database_id: databaseId,
@@ -50,6 +55,7 @@ export class NotionService {
                 },
             });
 
+            // Passo 2: Salvar no banco de dados
             const notion = new this.notionModel({
                 title: createTaskDto.title,
                 status: createTaskDto.status,
@@ -57,6 +63,9 @@ export class NotionService {
                 notionPageId: response.id,
             });
 
+            await notion.save({ session }); // Salva no banco de dados
+
+            // Passo 3: Atualizar a planilha
             const notionJson = {
                 title: notion.title,
                 status: notion.status,
@@ -93,12 +102,17 @@ export class NotionService {
             console.log(`Arquivo salvo em: ${file_path}`);
             console.table(notionJson);
 
-            return await notion.save();
+            // Se todas as operações forem bem-sucedidas, commit da transação
+            await session.commitTransaction();
+            session.endSession();
+
+            return notion;
         } catch (error) {
-            console.error(
-                'Erro ao criar a tarefa no Notion ou salvar no banco de dados:',
-                error,
-            );
+            // Se ocorrer um erro, desfaz a transação do banco de dados
+            await session.abortTransaction();
+            session.endSession();
+
+            console.error('Erro ao criar a tarefa ou salvar os dados:', error);
             throw error;
         }
     }
