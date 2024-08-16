@@ -55,5 +55,7 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Salvar a pasta planilhas no repositório mas não salvar o contéudo
+# Salvar a pasta planilhas no repositório mas não salvar o conteúdo
 planilhas/*
+!planilhas/.gitkeep
+
