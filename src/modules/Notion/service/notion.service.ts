@@ -32,14 +32,31 @@ export class NotionService {
                 parent: {
                     database_id: databaseId,
                 },
-                properties: createTaskDto.page.properties,
+                properties: {
+                    Tarefa: {
+                        title: [{ text: { content: createTaskDto.title } }],
+                    },
+                    Status: {
+                        status: {
+                            name: createTaskDto.status,
+                        },
+                    },
+                    Prioridade: {
+                        select: {
+                            name: createTaskDto.priority,
+                        },
+                    },
+                },
             });
 
-            // Salvar no MongoDB
-            const savedTask = await this.notionRepository.createTask(response);
+            const notion = new this.notionModel({
+                title: createTaskDto.title,
+                status: createTaskDto.status,
+                priority: createTaskDto.priority,
+                notionPageId: response.id,
+            });
 
-            console.log('Salvando Task do Notion no banco');
-            return savedTask;
+            return await notion.save();
         } catch (error) {
             console.error(
                 'Erro ao criar a tarefa no Notion ou salvar no banco de dados:',

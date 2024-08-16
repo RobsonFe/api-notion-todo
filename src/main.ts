@@ -8,7 +8,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     app.enableCors({
-        origin: 'localhost:3000',
+        origin: 'http://localhost:3000',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         allowedHeaders: 'Content-Type, Accept, Authorization',
     });
@@ -41,8 +41,7 @@ async function bootstrap() {
         }),
     );
 
-    const config = new DocumentBuilder();
-    config
+    const config = new DocumentBuilder()
         .addBearerAuth()
         .setTitle('Notion API')
         .setDescription('API de Manipulação aos dados do Notion')
@@ -52,9 +51,10 @@ async function bootstrap() {
             'Ativos',
             'https://celer.vercel.app',
             'tech@ativosprecatorios.com.br',
-        );
+        )
+        .build();
 
-    const document = SwaggerModule.createDocument(app, config.build());
+    const document = SwaggerModule.createDocument(app, config);
 
     SwaggerModule.setup('docs', app, document);
 

@@ -1,47 +1,39 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import {
     ApiCreatedResponse,
     ApiForbiddenResponse,
-    ApiHeader,
     ApiResponse,
     ApiTags,
+    ApiOperation,
 } from '@nestjs/swagger';
 import { NotionService } from '../service/notion.service';
 import { Notion } from '../schema/notion.schema';
 import { CreateTaskDto } from 'src/modules/dto/create-task.dto';
+
 @ApiTags('Notion')
 @Controller('notion')
 export class NotionController {
     constructor(private readonly notionService: NotionService) {}
 
-    //Criar Tarefa no Notion
-    @ApiHeader({
-        name: 'Criar Tarefa',
-        description:
-            'Cria uma tarefa no Notion e salva no banco de dados a tarefa',
-    })
     @Post('create')
+    @ApiOperation({ summary: 'Criar uma nova tarefa no Notion' })
     @ApiResponse({ status: 201, description: 'Tarefa realizada com sucesso' })
-    @ApiResponse({ status: 200, description: 'Tarefa realizada com sucesso' })
     @ApiCreatedResponse({
-        description: 'Tarefa realizada com sucesso.',
+        description: 'Tarefa criada e salva no banco de dados com sucesso.',
     })
-    @ApiForbiddenResponse({ description: 'Erro ao realizar a Tarefa' })
+    @ApiForbiddenResponse({ description: 'Erro ao realizar a tarefa' })
     @ApiResponse({
         status: 403,
-        description: 'Usuario não tem permissão para criar recurso',
+        description: 'Usuário não tem permissão para criar recurso',
     })
     @ApiResponse({
         status: 409,
-        description: 'Já existe uma Tarefa com os mesmos recursos',
+        description: 'Já existe uma tarefa com os mesmos recursos',
     })
     @ApiResponse({ status: 500, description: 'Ocorreu um erro no servidor' })
     @HttpCode(HttpStatus.CREATED)
     async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Notion> {
+        console.log('Dados Salvos: ', createTaskDto);
         return this.notionService.createTask(createTaskDto);
     }
 }
