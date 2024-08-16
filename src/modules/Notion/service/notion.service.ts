@@ -85,8 +85,18 @@ export class NotionService {
         }
     }
 
+    async findById(id: string) {
+        console.log(`ID para ser consultado: ${id}`);
+        return await this.notionRepository.findById(id);
+    }
+
+    async findByIdNotion(notionPageId: string) {
+        console.log(`ID do Notion para ser consultado: ${notionPageId}`);
+        return await this.notionRepository.findByIdNotion(notionPageId);
+    }
+
     async findAll(page: number, limit: number) {
-        const result = await this.notionRepository.findAllNotion(page, limit);
+        const result = await this.notionRepository.findAll(page, limit);
         const count = await this.notionRepository.countDocuments();
         console.log(
             `Dados Requisitados: ${result}\n Total de Páginas: ${page}\n Limite de Páginas: ${limit}\n Total de Dados no Banco: ${count}`,

@@ -6,6 +6,7 @@ import {
     HttpStatus,
     InternalServerErrorException,
     NotFoundException,
+    Param,
     Post,
     Query,
 } from '@nestjs/common';
@@ -91,6 +92,75 @@ export class NotionController {
         } catch (error) {
             console.error('Erro na procura dos dados', error);
             throw new InternalServerErrorException('Erro na procura dos dados');
+        }
+    }
+
+    @ApiHeader({
+        name: 'Busca dados pelo ID',
+        description: 'Busca dados no banco de dados pelo ID da tarefa',
+    })
+    @Get('buscar/:id')
+    @ApiOperation({ summary: 'Buscar dados pelo ID.' })
+    @ApiResponse({ status: 200, description: 'Consulta Bem Sucedida' })
+    @ApiResponse({ status: 404, description: 'Não Encontrado' })
+    @ApiResponse({ status: 400, description: 'ID Inválido ou Não Existe' })
+    @ApiResponse({ status: 500, description: 'Ocorreu um erro no servidor' })
+    @ApiOkResponse({
+        description: 'Dados atualizados com sucesso.',
+    })
+    @ApiForbiddenResponse({ description: 'Erro ao realizar a consulta' })
+    @HttpCode(HttpStatus.OK)
+    async findById(@Param('id') id: string): Promise<Notion | null> {
+        try {
+            const findId = this.notionService.findById(id);
+            if (findId === null) {
+                throw new NotFoundException(`Esse ${id} não existe no banco`);
+            }
+            return findId;
+        } catch (error) {
+            console.error(`erro na busca do ID: ${id} `, error);
+            throw new InternalServerErrorException(
+                `Nenhum dado encontrado por esse ID: ${id}`,
+            );
+        }
+    }
+
+    @ApiHeader({
+        name: 'Busca dados pelo ID do Notion',
+        description: 'Busca dados no banco de dados pelo ID do Notion',
+    })
+    @Get('doc/:notionPageId')
+    @ApiOperation({ summary: 'Buscar dados pelo ID do Notion.' })
+    @ApiResponse({ status: 200, description: 'Consulta Bem Sucedida' })
+    @ApiResponse({ status: 404, description: 'Não Encontrado' })
+    @ApiResponse({
+        status: 400,
+        description: 'ID Inválido ou Não Existe',
+    })
+    @ApiResponse({ status: 500, description: 'Ocorreu um erro no servidor' })
+    @ApiOkResponse({
+        description: 'Dados atualizados com sucesso.',
+    })
+    @ApiForbiddenResponse({ description: 'Erro ao realizar a consulta' })
+    @HttpCode(HttpStatus.OK)
+    async findNotionPageId(
+        @Param('notionPageId') notionPageId: string,
+    ): Promise<Notion | null> {
+        try {
+            const notion =
+                await this.notionService.findByIdNotion(notionPageId);
+            if (!notion) {
+                throw new NotFoundException(
+                    `ID do Notion: ${notionPageId} não encontrado`,
+                );
+            }
+            return notion;
+        } catch (error) {
+            console.error(
+                `Erro ao buscar ID do Notion: ${notionPageId}:`,
+                error,
+            );
+            throw error;
         }
     }
 }

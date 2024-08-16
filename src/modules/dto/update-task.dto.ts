@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsString } from 'class-validator';
 import { Prioridade, Status } from '../enum/notion.enum';
 
-export class CreateTaskDto {
+export class UpdateTaskDto {
     @ApiProperty({
         description: 'O titulo da Tarefa',
         required: true,

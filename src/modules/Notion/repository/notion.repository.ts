@@ -12,12 +12,20 @@ export class NotionRepository {
         return createTask.save();
     }
 
-    async findAllNotion(page: number, limit: number): Promise<Notion[]> {
+    async findAll(page: number, limit: number): Promise<Notion[]> {
         const skip = (page - 1) * limit;
         return this.notionModel.find().skip(skip).limit(limit).exec();
     }
 
     async countDocuments(): Promise<number> {
         return this.notionModel.countDocuments().exec();
+    }
+
+    async findById(id: string): Promise<Notion | null> {
+        return this.notionModel.findById(id).exec();
+    }
+
+    async findByIdNotion(notionPageId: string): Promise<Notion | null> {
+        return await this.notionModel.findOne({ notionPageId }).exec();
     }
 }
