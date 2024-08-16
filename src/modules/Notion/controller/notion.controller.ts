@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     HttpStatus,
@@ -18,6 +19,7 @@ import {
     ApiOperation,
     ApiHeader,
     ApiOkResponse,
+    ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { NotionService } from '../service/notion.service';
 import { Notion } from '../schema/notion.schema';
@@ -161,6 +163,47 @@ export class NotionController {
                 error,
             );
             throw error;
+        }
+    }
+
+    @ApiHeader({
+        name: 'Deletar uma Tarefa',
+        description: 'Dados para serem deletados.',
+    })
+    @ApiOperation({ summary: 'Deletar dados pelo ID.' })
+    @ApiNoContentResponse({
+        description: 'Dados deletados com sucesso.',
+    })
+    @ApiForbiddenResponse({ description: 'Erro ao realizar a deleção' })
+    @ApiResponse({ status: 204, description: 'Dados deletados com sucesso' })
+    @ApiResponse({ status: 200, description: 'Dados deletados com sucesso' })
+    @ApiResponse({ status: 400, description: 'ID invalido para a requisição' })
+    @ApiResponse({ status: 401, description: 'Usuario não autenticado' })
+    @ApiResponse({
+        status: 403,
+        description: 'Usuario sem permissão para deletar dados',
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Os dados para serem deletados não foram encontrados',
+    })
+    @ApiResponse({
+        status: 409,
+        description: 'Deleção em conflito com alguma regra de negocios',
+    })
+    @ApiResponse({ status: 500, description: 'Ocorreu um erro no servidor' })
+    @Delete('deletar/:id')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async delete(@Param('id') id: string): Promise<void> {
+        try {
+            const deleteById = await this.notionService.delete(id);
+            if (!deleteById) {
+                throw new NotFoundException(
+                    `Id: ${id} informado para a remoção, não foi encontrado`,
+                );
+            }
+        } catch (error) {
+            console.error(`erro ao deletar dados do ID: ${id}`, error);
         }
     }
 }

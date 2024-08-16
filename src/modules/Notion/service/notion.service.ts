@@ -103,4 +103,9 @@ export class NotionService {
         );
         return { result, count, page, limit };
     }
+
+    async delete(id: string) {
+        console.log(`ID do dado que será deletado ${id}`);
+        return this.notionRepository.delete(id);
+    }
 }

@@ -28,4 +28,8 @@ export class NotionRepository {
     async findByIdNotion(notionPageId: string): Promise<Notion | null> {
         return await this.notionModel.findOne({ notionPageId }).exec();
     }
+
+    async delete(id: string): Promise<Notion | null> {
+        return this.notionModel.findByIdAndDelete(id).exec();
+    }
 }
