@@ -6,6 +6,7 @@ import { Client } from '@notionhq/client';
 import * as dotenv from 'dotenv';
 import { CreateTaskDto } from 'src/modules/dto/create-task.dto';
 import * as XLSX from 'xlsx';
+import { UpdatePageParameters } from '@notionhq/client/build/src/api-endpoints';
 dotenv.config();
 
 @Injectable()
@@ -143,18 +144,59 @@ export class NotionService {
 
     async update(id: string, updateData: Partial<Notion>) {
         try {
+            const { _id, ...dataToUpdate } = updateData;
+
+            // Atualizar no banco de dados
             const updatedNotion = await this.notionRepository.update(
                 id,
-                updateData,
+                dataToUpdate,
             );
 
             if (!updatedNotion) {
                 throw new Error('Consulta não encontrada');
             }
-            console.log('Atualização dos Dados: ', updatedNotion);
-            return updatedNotion;
+
+            // Atualizar a página no Notion
+            const notionUpdateData: UpdatePageParameters = {
+                page_id: updatedNotion.notionPageId,
+                properties: {
+                    Tarefa: {
+                        title: [
+                            {
+                                text: {
+                                    content:
+                                        dataToUpdate.title ||
+                                        updatedNotion.title,
+                                },
+                            },
+                        ],
+                    },
+                    Status: {
+                        status: {
+                            name: dataToUpdate.status || updatedNotion.status,
+                        },
+                    },
+                    Prioridade: {
+                        select: {
+                            name:
+                                dataToUpdate.priority || updatedNotion.priority,
+                        },
+                    },
+                },
+            };
+
+            console.log(
+                'Dados Atualizados: ',
+                `${JSON.stringify(updateData, null, 2)}`,
+            );
+            const response = await this.notion.pages.update(notionUpdateData);
+
+            return { updatedNotion, response };
         } catch (error) {
-            console.error('Erro na atualização:', error);
+            console.error(
+                'Erro na atualização:',
+                error.response?.data || error,
+            );
             throw new Error('Erro ao atualizar a consulta');
         }
     }

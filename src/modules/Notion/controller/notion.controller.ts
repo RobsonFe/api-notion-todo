@@ -242,23 +242,12 @@ export class NotionController {
     async update(
         @Param('id') id: string,
         @Body() updateNotion: Partial<Notion>,
-    ): Promise<Notion | null> {
+    ) {
         try {
-            const updatedNotion = await this.notionService.update(
-                id,
-                updateNotion,
-            );
-
-            if (!updatedNotion) {
-                throw new NotFoundException(
-                    `Erro na atualização por esse ID: ${id}`,
-                );
-            }
-
-            return updatedNotion;
+            return await this.notionService.update(id, updateNotion);
         } catch (error) {
             console.error(
-                `erro na atualização, o ID: ${id} fornecido não foi encontrado`,
+                `Erro na atualização, o ID: ${id} fornecido não foi encontrado`,
                 error,
             );
             throw new InternalServerErrorException(
