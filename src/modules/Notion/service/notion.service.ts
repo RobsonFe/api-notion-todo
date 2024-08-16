@@ -64,8 +64,7 @@ export class NotionService {
                 notionPageId: notion.notionPageId,
             };
 
-            const timestamp = Date.now();
-            const file_path = `./planilhas/Tarefas-${timestamp}.xlsx`;
+            const file_path = `./planilhas/Tarefas.xlsx`;
             // Criar uma nova planilha e adicionar os dados
             const workbook = XLSX.utils.book_new(); // Cria um novo arquivo Excel
             const worksheet = XLSX.utils.json_to_sheet([notionJson]); // Adiciona o JSON na planilha
@@ -107,5 +106,23 @@ export class NotionService {
     async delete(id: string) {
         console.log(`ID do dado que será deletado ${id}`);
         return this.notionRepository.delete(id);
+    }
+
+    async update(id: string, updateData: Partial<Notion>) {
+        try {
+            const updatedNotion = await this.notionRepository.update(
+                id,
+                updateData,
+            );
+
+            if (!updatedNotion) {
+                throw new Error('Consulta não encontrada');
+            }
+            console.log('Atualização dos Dados: ', updatedNotion);
+            return updatedNotion;
+        } catch (error) {
+            console.error('Erro na atualização:', error);
+            throw new Error('Erro ao atualizar a consulta');
+        }
     }
 }

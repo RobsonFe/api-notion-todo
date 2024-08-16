@@ -32,4 +32,24 @@ export class NotionRepository {
     async delete(id: string): Promise<Notion | null> {
         return this.notionModel.findByIdAndDelete(id).exec();
     }
+
+    async update(
+        id: string,
+        updateData: Partial<Notion>,
+    ): Promise<Notion | null> {
+        try {
+            const updatedNotion = await this.notionModel
+                .findByIdAndUpdate(id, updateData, { new: true })
+                .exec();
+
+            if (!updatedNotion) {
+                throw new Error('Dados do notion não encontrado');
+            }
+
+            return updatedNotion;
+        } catch (error) {
+            console.error('Erro na atualização dos dados:', error);
+            throw new Error('Erro ao consultar os dados.');
+        }
+    }
 }

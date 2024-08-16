@@ -9,6 +9,7 @@ import {
     NotFoundException,
     Param,
     Post,
+    Put,
     Query,
 } from '@nestjs/common';
 import {
@@ -204,6 +205,65 @@ export class NotionController {
             }
         } catch (error) {
             console.error(`erro ao deletar dados do ID: ${id}`, error);
+        }
+    }
+
+    @ApiHeader({
+        name: 'Atualização de Dados',
+        description: 'Dados para serem atualizados.',
+    })
+    @ApiOperation({ summary: 'Atualizar Dados das Tarefas.' })
+    @ApiOkResponse({
+        description: 'Dados atualizados com sucesso.',
+    })
+    @ApiForbiddenResponse({ description: 'Erro ao realizar a consulta' })
+    @ApiResponse({ status: 200, description: 'Listagem retornada com sucesso' })
+    @ApiResponse({ status: 204, description: 'A Lista está vazia' })
+    @ApiResponse({
+        status: 400,
+        description: 'A solicitação contem erros ou dados invalidos',
+    })
+    @ApiResponse({ status: 401, description: 'O usuario sem autenticação' })
+    @ApiResponse({
+        status: 403,
+        description: 'O usuario sem autorização para atualizar os dados',
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'Os dados para atualização não foram encontrados',
+    })
+    @ApiResponse({
+        status: 409,
+        description: 'Atualização em conflitos com outras regras de negocios',
+    })
+    @ApiResponse({ status: 500, description: 'Ocorreu  um erro no servidor' })
+    @Put('atualizar/:id')
+    @HttpCode(HttpStatus.OK)
+    async update(
+        @Param('id') id: string,
+        @Body() updateNotion: Partial<Notion>,
+    ): Promise<Notion | null> {
+        try {
+            const updatedNotion = await this.notionService.update(
+                id,
+                updateNotion,
+            );
+
+            if (!updatedNotion) {
+                throw new NotFoundException(
+                    `Erro na atualização por esse ID: ${id}`,
+                );
+            }
+
+            return updatedNotion;
+        } catch (error) {
+            console.error(
+                `erro na atualização, o ID: ${id} fornecido não foi encontrado`,
+                error,
+            );
+            throw new InternalServerErrorException(
+                'Erro ao atualizar os dados',
+            );
         }
     }
 }
