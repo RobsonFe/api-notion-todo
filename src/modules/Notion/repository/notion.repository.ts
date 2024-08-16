@@ -11,4 +11,13 @@ export class NotionRepository {
         const createTask = new this.notionModel(createTaskDto);
         return createTask.save();
     }
+
+    async findAllNotion(page: number, limit: number): Promise<Notion[]> {
+        const skip = (page - 1) * limit;
+        return this.notionModel.find().skip(skip).limit(limit).exec();
+    }
+
+    async countDocuments(): Promise<number> {
+        return this.notionModel.countDocuments().exec();
+    }
 }

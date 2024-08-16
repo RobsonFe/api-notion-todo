@@ -65,4 +65,13 @@ export class NotionService {
             throw error;
         }
     }
+
+    async findAll(page: number, limit: number) {
+        const result = await this.notionRepository.findAllNotion(page, limit);
+        const count = await this.notionRepository.countDocuments();
+        console.log(
+            `Dados Requisitados: ${result}\n Total de Páginas: ${page}\n Limite de Páginas: ${limit}\n Total de Dados no Banco: ${count}`,
+        );
+        return { result, count, page, limit };
+    }
 }
