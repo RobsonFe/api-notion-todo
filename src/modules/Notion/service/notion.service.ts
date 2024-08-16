@@ -5,6 +5,7 @@ import { Notion } from '../schema/notion.schema';
 import { Client } from '@notionhq/client';
 import * as dotenv from 'dotenv';
 import { CreateTaskDto } from 'src/modules/dto/create-task.dto';
+import * as XLSX from 'xlsx';
 dotenv.config();
 
 @Injectable()
@@ -55,6 +56,23 @@ export class NotionService {
                 priority: createTaskDto.priority,
                 notionPageId: response.id,
             });
+
+            const notionJson = {
+                title: notion.title,
+                status: notion.status,
+                priority: notion.priority,
+                notionPageId: notion.notionPageId,
+            };
+
+            const timestamp = Date.now();
+            const file_path = `./planilhas/Tarefas-${timestamp}.xlsx`;
+            // Criar uma nova planilha e adicionar os dados
+            const workbook = XLSX.utils.book_new(); // Cria um novo arquivo Excel
+            const worksheet = XLSX.utils.json_to_sheet([notionJson]); // Adiciona o JSON na planilha
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Tarefas`); // Cria a planilha com todos os dados passados.
+            XLSX.writeFile(workbook, file_path); // Arquivo Excel que será escrito e o caminho onde ficará salvo o arquivo.
+
+            console.log(`Arquivo salvo em: ${file_path}`);
 
             return await notion.save();
         } catch (error) {
