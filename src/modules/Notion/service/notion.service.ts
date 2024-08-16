@@ -72,6 +72,7 @@ export class NotionService {
             XLSX.utils.book_append_sheet(workbook, worksheet, `Tarefas`); // Cria a planilha com todos os dados passados.
             XLSX.writeFile(workbook, file_path); // Arquivo Excel que será escrito e o caminho onde ficará salvo o arquivo.
 
+            console.table(notionJson);
             console.log(`Arquivo salvo em: ${file_path}`);
 
             return await notion.save();
