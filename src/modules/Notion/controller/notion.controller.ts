@@ -255,4 +255,31 @@ export class NotionController {
             );
         }
     }
+    @ApiHeader({
+        name: 'Deletar uma Tarefa do Notion',
+        description: 'Deletar uma tarefa no Notion e do banco de dados.',
+    })
+    @ApiOperation({
+        summary: 'Deletar uma tarefa no Notion e no banco de dados.',
+    })
+    @ApiResponse({ status: 200, description: 'Tarefa deletada com sucesso' })
+    @ApiResponse({ status: 404, description: 'Tarefa não encontrada' })
+    @ApiResponse({ status: 500, description: 'Ocorreu um erro no servidor' })
+    @Delete('delete-task/:id')
+    @HttpCode(HttpStatus.OK)
+    async deleteNotionTask(
+        @Param('id') id: string,
+        @Body() deleteData: Partial<Notion>,
+    ): Promise<any> {
+        console.log('ID recebido:', id);
+        try {
+            const result = await this.notionService.deleteNotionTask(id);
+            return result;
+        } catch (error) {
+            if (error.message === 'Tarefa não encontrada no banco de dados') {
+                throw new NotFoundException(error.message);
+            }
+            throw new InternalServerErrorException('Erro ao deletar a tarefa');
+        }
+    }
 }

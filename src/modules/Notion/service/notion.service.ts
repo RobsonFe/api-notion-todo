@@ -208,4 +208,37 @@ export class NotionService {
         console.log(`ID do dado que será deletado ${id}`);
         return this.notionRepository.delete(id);
     }
+
+    async deleteNotionTask(id: string) {
+        console.log('ID do Banco de Dados para ser deletado:', id);
+        try {
+            // Encontrar o documento no banco de dados pelo ID do banco de dados
+            const findNotionRecord = await this.notionRepository.findById(id);
+
+            if (!findNotionRecord) {
+                throw new Error('Tarefa não encontrada no banco de dados');
+            }
+
+            const { notionPageId } = findNotionRecord;
+
+            // Deletar do banco de dados usando o ID encontrado
+            const deleteByDatabase = await this.notionRepository.delete(id);
+
+            // Deletar do Notion usando o notionPageId
+            const notionDeleteResponse = await this.notion.pages.update({
+                page_id: notionPageId,
+                archived: true, // Marca a página como arquivada (ou "deletada")
+            });
+
+            console.log(
+                'Tarefa deletada com sucesso:',
+                deleteByDatabase,
+                notionDeleteResponse,
+            );
+            return { deleteByDatabase, notionDeleteResponse };
+        } catch (error) {
+            console.error('Erro ao deletar a tarefa:', error);
+            throw new Error('Falha ao deletar a tarefa');
+        }
+    }
 }

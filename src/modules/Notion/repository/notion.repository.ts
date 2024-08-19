@@ -14,7 +14,7 @@ export class NotionRepository {
 
     async findAll(page: number, limit: number): Promise<Notion[]> {
         const skip = (page - 1) * limit;
-        return this.notionModel.find().skip(skip).limit(limit).exec();
+        return this.notionModel.find().skip(skip).limit(limit).sort().exec();
     }
 
     async countDocuments(): Promise<number> {
