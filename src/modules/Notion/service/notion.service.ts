@@ -235,7 +235,10 @@ export class NotionService {
                 deleteByDatabase,
                 notionDeleteResponse,
             );
-            return { deleteByDatabase, notionDeleteResponse };
+
+            const database = this.findAll(1, 10);
+
+            return { deleteByDatabase, notionDeleteResponse, database };
         } catch (error) {
             console.error('Erro ao deletar a tarefa:', error);
             throw new Error('Falha ao deletar a tarefa');
