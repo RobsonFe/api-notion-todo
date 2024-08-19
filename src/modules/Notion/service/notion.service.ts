@@ -20,6 +20,7 @@ export class NotionService {
         this.notion = new Client({ auth: process.env.NOTION_TOKEN });
     }
 
+    // Criar dados de tarefas no Notion e Salvar no banco de dados externo.
     async createTask(createTaskDto: CreateTaskDto): Promise<Notion> {
         // Começar uma transação para as operações do banco de dados, se possível
         const session = await this.notionModel.startSession();
@@ -118,30 +119,7 @@ export class NotionService {
         }
     }
 
-    async findById(id: string) {
-        console.log(`ID para ser consultado: ${id}`);
-        return await this.notionRepository.findById(id);
-    }
-
-    async findByIdNotion(notionPageId: string) {
-        console.log(`ID do Notion para ser consultado: ${notionPageId}`);
-        return await this.notionRepository.findByIdNotion(notionPageId);
-    }
-
-    async findAll(page: number, limit: number) {
-        const result = await this.notionRepository.findAll(page, limit);
-        const count = await this.notionRepository.countDocuments();
-        console.log(
-            `Dados Requisitados: ${result}\n Total de Páginas: ${page}\n Limite de Páginas: ${limit}\n Total de Dados no Banco: ${count}`,
-        );
-        return { result, count, page, limit };
-    }
-
-    async delete(id: string) {
-        console.log(`ID do dado que será deletado ${id}`);
-        return this.notionRepository.delete(id);
-    }
-
+    // Atualizar dados do banco de dados e do Notion.
     async update(id: string, updateData: Partial<Notion>) {
         try {
             const { _id, ...dataToUpdate } = updateData;
@@ -199,5 +177,35 @@ export class NotionService {
             );
             throw new Error('Erro ao atualizar a consulta');
         }
+    }
+
+    // Encontrar dados pelo ID do banco de dados.
+    async findById(id: string) {
+        console.log(`ID para ser consultado: ${id}`);
+        return await this.notionRepository.findById(id);
+    }
+
+    // Encontrar dados pelo ID do Notion no banco de dados.
+    async findByIdNotion(notionPageId: string) {
+        console.log(`ID do Notion para ser consultado: ${notionPageId}`);
+        return await this.notionRepository.findByIdNotion(notionPageId);
+    }
+
+    // Encontrar todos os dados do banco de dados
+    async findAll(page: number, limit: number) {
+        const result = (
+            await this.notionRepository.findAll(page, limit)
+        ).sort();
+        const count = await this.notionRepository.countDocuments();
+        console.log(
+            `Dados Requisitados: ${result}\n Total de Páginas: ${page}\n Limite de Páginas: ${limit}\n Total de Dados no Banco: ${count}`,
+        );
+        return { result, count, page, limit };
+    }
+
+    // Deletar um item do banco de dados.
+    async delete(id: string) {
+        console.log(`ID do dado que será deletado ${id}`);
+        return this.notionRepository.delete(id);
     }
 }
