@@ -115,7 +115,7 @@ export class NotionController {
     @HttpCode(HttpStatus.OK)
     async findById(@Param('id') id: string): Promise<Notion | null> {
         try {
-            const findId = this.notionService.findById(id);
+            const findId = await this.notionService.findById(id);
             if (findId === null) {
                 throw new NotFoundException(`Esse ${id} não existe no banco`);
             }

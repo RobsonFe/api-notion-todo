@@ -163,11 +163,30 @@ export class NotionService {
                 },
             };
 
-            console.log(
-                'Dados Atualizados: ',
-                `${JSON.stringify(updateData, null, 2)}`,
-            );
             const response = await this.notion.pages.update(notionUpdateData);
+
+            // Atualizar a planilha de Excel
+            const file_path = `./planilhas/Tarefas.xlsx`;
+            const workbook = XLSX.readFile(file_path);
+            const worksheet = workbook.Sheets['Tarefas'];
+
+            const worksheetData = XLSX.utils.sheet_to_json(worksheet);
+            const updatedWorksheetData = worksheetData.map((row: any) => {
+                if (row.notionPageId === updatedNotion.notionPageId) {
+                    return {
+                        ...row,
+                        title: dataToUpdate.title || updatedNotion.title,
+                        status: dataToUpdate.status || updatedNotion.status,
+                        priority:
+                            dataToUpdate.priority || updatedNotion.priority,
+                    };
+                }
+                return row;
+            });
+
+            const newWorksheet = XLSX.utils.json_to_sheet(updatedWorksheetData);
+            workbook.Sheets['Tarefas'] = newWorksheet;
+            XLSX.writeFile(workbook, file_path);
 
             return { updatedNotion, response };
         } catch (error) {
@@ -230,15 +249,27 @@ export class NotionService {
                 archived: true, // Marca a página como arquivada (ou "deletada")
             });
 
+            // Atualizar a planilha de Excel para remover a tarefa deletada
+            const file_path = `./planilhas/Tarefas.xlsx`;
+            const workbook = XLSX.readFile(file_path);
+            const worksheet = workbook.Sheets['Tarefas'];
+
+            const worksheetData = XLSX.utils.sheet_to_json(worksheet);
+            const updatedWorksheetData = worksheetData.filter(
+                (row: any) => row.notionPageId !== notionPageId,
+            );
+
+            const newWorksheet = XLSX.utils.json_to_sheet(updatedWorksheetData);
+            workbook.Sheets['Tarefas'] = newWorksheet;
+            XLSX.writeFile(workbook, file_path);
+
             console.log(
                 'Tarefa deletada com sucesso:',
                 deleteByDatabase,
                 notionDeleteResponse,
             );
 
-            const database = this.findAll(1, 10);
-
-            return { deleteByDatabase, notionDeleteResponse, database };
+            return { deleteByDatabase, notionDeleteResponse };
         } catch (error) {
             console.error('Erro ao deletar a tarefa:', error);
             throw new Error('Falha ao deletar a tarefa');
