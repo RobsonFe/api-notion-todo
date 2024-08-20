@@ -19,6 +19,12 @@ Esse projeto consiste em uma API feita em NestJS integrada com o banco de dados 
 -   Swagger e OpenAPI para documentação da API.
 -   Biblioteca XLSX para gerar relatórios Node em Excel.
 
+## Front-End
+
+Para o front-end, foi utilizado o Angular, com o Flowbite e Tailwind para a criação de component.
+<br>
+[Repositório do Front-end](https://github.com/RobsonFe/notion-front)
+
 ## Instalação
 
 ```bash
@@ -105,8 +111,9 @@ Esta API REST gerencia tarefas com os seguintes campos: `title`, `status`, `prio
 
 ### 1. **Criar Tarefa**
 
--   **URL:** `/api/tasks`
+-   **URL:** `/api/v1/notion/create`
 -   **Método:** `POST`
+-
 -   **Descrição:** Cria uma nova tarefa.
 -   **Corpo da Requisição:**
     ```json
@@ -134,7 +141,7 @@ Esta API REST gerencia tarefas com os seguintes campos: `title`, `status`, `prio
 
 ### 2. **Listar Tarefas**
 
--   **URL:** `/api/tasks`
+-   **URL:** `/api/v1/notion/list`
 -   **Método:** `GET`
 -   **Descrição:** Retorna uma lista de todas as tarefas.
 -   **Parâmetros de Consulta (Opcional):**
@@ -195,7 +202,7 @@ Esta API REST gerencia tarefas com os seguintes campos: `title`, `status`, `prio
 
 ### 3. **Obter Detalhes de uma Tarefa**
 
--   **URL:** `/api/tasks/{id}`
+-   **URL:** `/api/v1/notion/buscar/{id}`
 -   **Método:** `GET`
 -   **Descrição:** Retorna os detalhes de uma tarefa específica.
 -   **Parâmetros de Caminho:**
@@ -218,7 +225,7 @@ Esta API REST gerencia tarefas com os seguintes campos: `title`, `status`, `prio
 
 ### 4. **Atualizar Tarefa**
 
--   **URL:** `/api/tasks/{id}`
+-   **URL:** `/api/v1/notion/atualizar/{id}`
 -   **Método:** `PUT`
 -   **Descrição:** Atualiza uma tarefa existente.
 -   **Parâmetros de Caminho:**
@@ -251,7 +258,7 @@ Esta API REST gerencia tarefas com os seguintes campos: `title`, `status`, `prio
 
 ### 5. **Deletar Tarefa**
 
--   **URL:** `/api/tasks/{id}`
+-   **URL:** `/api/v1/notion/delete-task/{id}`
 -   **Método:** `DELETE`
 -   **Descrição:** Remove uma tarefa específica.
 -   **Parâmetros de Caminho:**
