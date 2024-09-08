@@ -5,7 +5,7 @@ export class AppService {
     getHello(): string {
         return `
       <h1>
-      Ativos - Notion API
+      Robson Ferreira - Notion API
       </h1>
       <a href="/docs">Documentação</a>
       `;

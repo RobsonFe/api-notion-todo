@@ -46,11 +46,11 @@ async function bootstrap() {
         .setTitle('Notion API')
         .setDescription('API de Manipulação aos dados do Notion')
         .setVersion('0.1')
-        .addTag('Ativos')
+        .addTag('API Notion')
         .setContact(
-            'Ativos',
-            'https://celer.vercel.app',
-            'tech@ativosprecatorios.com.br',
+            'ROBSON',
+            'https://github.com/RobsonFe/api-notion-todo',
+            'robson-ferreiradasilva@hotmail.com',
         )
         .build();
 
